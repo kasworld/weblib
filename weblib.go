@@ -14,6 +14,7 @@ package weblib
 import (
 	"bufio"
 	"fmt"
+	"io"
 	"net/http"
 	"os"
 	"strconv"
@@ -158,6 +159,26 @@ func WebLog(logFilename string, size int64, w http.ResponseWriter, r *http.Reque
 	}
 	if err := scanner.Err(); err != nil {
 		return fmt.Errorf("Read Failed (%s), %v", logFilename, err)
+	}
+	return nil
+}
+
+func File2WebOut(w http.ResponseWriter, outfile string) error {
+	fullfilename := outfile
+	finfo, err := os.Stat(fullfilename)
+	if err != nil {
+		http.Error(w, err.Error(), 404)
+		return err
+	}
+	fd, err := os.OpenFile(fullfilename, os.O_RDONLY, 0660)
+	if err != nil {
+		http.Error(w, err.Error(), 404)
+		return err
+	}
+	defer fd.Close()
+	if _, err := io.CopyN(w, fd, finfo.Size()); err != nil {
+		http.Error(w, err.Error(), 404)
+		return err
 	}
 	return nil
 }
