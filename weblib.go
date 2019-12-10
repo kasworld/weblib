@@ -14,6 +14,7 @@ package weblib
 import (
 	"bufio"
 	"fmt"
+	"html/template"
 	"io"
 	"net/http"
 	"os"
@@ -181,4 +182,23 @@ func File2WebOut(w http.ResponseWriter, outfile string) error {
 		return err
 	}
 	return nil
+}
+
+func PageMid(
+	listLen, pagesize int,
+	urlStr string,
+	w http.ResponseWriter, r *http.Request) {
+	pList := make([]bool, listLen/pagesize+1)
+
+	tplIndex, err := template.New("index").Parse(`
+		{{range $i, $v := .}}
+		<a href="` + urlStr + `?page={{$i}}">{{$i}}</a>
+		{{end}}
+	`)
+	if err != nil {
+		fmt.Printf("%v\n", err)
+	}
+	if err := tplIndex.Execute(w, pList); err != nil {
+		fmt.Printf("%v\n", err)
+	}
 }
