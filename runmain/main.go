@@ -24,8 +24,8 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/kasworld/log/genlog/basiclog"
 	"github.com/kasworld/log/logflags"
-	"github.com/kasworld/log/loggen/basiclog"
 	"github.com/kasworld/weblib"
 )
 
@@ -36,7 +36,7 @@ import (
 // }
 
 func main() {
-	basiclog.SetFlags(basiclog.GetFlags().BitClear(logflags.LF_functionname))
+	basiclog.GlobalLogger.SetFlags(basiclog.GlobalLogger.GetFlags().BitClear(logflags.LF_functionname))
 	app := NewApp()
 	app.ServiceMain(context.Background())
 }
